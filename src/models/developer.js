@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const DevSchema = new mongoose.Schema({
+const DeveloperSchema = new mongoose.Schema({
   name: String,
-  github_name: String,
+  github_username: String,
   bio: String,
   avatar_url: String,
   techs: [String],
 });
 
-module.exports = mongoose.model('Developer', DevSchema);
+module.exports = mongoose.model('Developer', DeveloperSchema);
