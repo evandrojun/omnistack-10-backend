@@ -3,29 +3,39 @@ const axios = require('axios');
 const Developer = require('../models/developer');
 
 module.exports = {
-  async store(request, response) {
+  async index(request, response) {
+    const developers = await Developer.find();
+
+    return response.json(developers);
+  },
+
+  async create(request, response) {
     const { github_username, techs, latitude, longitude } = request.body;
 
-    const apiResponse = await axios.get(`https://api.github.com/users/${github_username}`);
+    let developer = await Developer.findOne({ github_username });
 
-    const { name = login, avatar_url, bio } = apiResponse.data;
+    if (!developer) {
+      const apiResponse = await axios.get(`https://api.github.com/users/${github_username}`);
 
-    const techsArray = techs.split(',').map(tech => tech.trim());
+      const { name = login, avatar_url, bio } = apiResponse.data;
 
-    const location = {
-      type: 'Point',
-      coordinates: [longitude, latitude],
-    };
+      const techsArray = techs.split(',').map(tech => tech.trim());
 
-    const newDeveloper = await Developer.create({
-      name,
-      github_username,
-      bio,
-      avatar_url,
-      techs: techsArray,
-      location,
-    });
+      const location = {
+        type: 'Point',
+        coordinates: [longitude, latitude],
+      };
 
-    return response.json(newDeveloper);
+      developer = await Developer.create({
+        name,
+        github_username,
+        bio,
+        avatar_url,
+        techs: techsArray,
+        location,
+      });
+    }
+
+    return response.json(developer);
   }
 };
